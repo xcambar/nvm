@@ -86,7 +86,7 @@ nvm_error () {
 }
 
 # Checks that the selected method exists
-# and s available
+# and is available
 # Helps when the user specifies the method
 nvm_check_method() {
   local method="$1"
