@@ -113,7 +113,7 @@ nvm_default_source() {
   local method="$1"
   if [ "$method" = "git" ]; then
     echo "https://github.com/creationix/nvm.git"
-  elif [ "$method" = "script" ]; then
+  elif [ "$method" = "curl" ] || [ "$method" = "wget" ]; then
     echo "https://raw.githubusercontent.com/creationix/nvm/v0.17.2/nvm.sh"
   fi
 }
