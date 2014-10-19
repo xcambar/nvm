@@ -7,9 +7,14 @@ nvm_has() {
   echo $?
 }
 
-# Detect profile file if not specified as environment variable (eg: PROFILE=~/.myprofile).
+# Detect profile file 
+# We're not doing anything critical here
+# The checks will come later
 nvm_lookup_profile() {
-  if [ -f "$HOME/.bashrc" ]; then
+  local profile="$1"
+  if [ -n "$profile" ]; then
+    echo "$profile"
+  elif [ -f "$HOME/.bashrc" ]; then
     echo "$HOME/.bashrc"
   elif [ -f "$HOME/.bash_profile" ]; then
     echo "$HOME/.bash_profile"
@@ -150,8 +155,6 @@ nvm_update_profile() {
   local profile="$1"
   local nvm_dir="$2"
   local source="\nexport NVM_DIR=\"$nvm_dir\"\n[ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\"  # This loads nvm"
-  : ${profile:=$(nvm_lookup_profile)}
-
 
   if [ -z "$profile" ] || [ ! -f "$profile" ] ; then
     nvm_manual_profile_update_msg "$source"
@@ -191,19 +194,25 @@ nvm_setup_method() {
   echo $method
 }
 
+run() {
+  method=$(nvm_setup_method "$METHOD" $(nvm_has "git") $(nvm_has "curl") $(nvm_has "wget"))
+  profile=$(nvm_lookup_profile "$PROFILE")
+  : ${NVM_DIR:="$HOME/.nvm"}
+  : ${NVM_SOURCE:=$(nvm_default_source $method)}
+
+  nvm_install_with_method "$method" "$NVM_SOURCE" "$NVM_DIR"
+  nvm_update_profile "$profile" "$NVM_DIR"
+
+  source "$NVM_DIR/nvm.sh"
+  echo "=> Installation successful."
+}
 
 # Environment variables:
 # NVM_DIR
 # NVM_SOURCE
 # METHOD
 # PROFILE
-method=$(nvm_setup_method "$METHOD" $(nvm_has "git") $(nvm_has "curl") $(nvm_has "wget"))
-: ${NVM_DIR:="$HOME/.nvm"}
-: ${NVM_SOURCE:=$(nvm_default_source $method)}
 
-nvm_install_with_method "$method" "$NVM_SOURCE" "$NVM_DIR"
-nvm_update_profile "$PROFILE" "$NVM_DIR"
-
-source "$NVM_DIR/nvm.sh"
-echo "=> Installation successful."
-
+if [ "$ENV" != "testing" ]; then 
+  run
+fi
