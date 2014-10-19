@@ -6,7 +6,7 @@ describe "nvm_has"
 
 it_succeeds_when_executable_exists() {
   local code
-  $( nvm_has ls ) && code="OK_$?" || code="KO_$?"; 
+  nvm_has ls && code="OK_$?" || code="KO_$?"; 
   test "$code" = "OK_0"
 }
 

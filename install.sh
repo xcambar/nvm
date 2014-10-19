@@ -82,7 +82,7 @@ install_nvm_as_script() {
 
 nvm_error () {
   echo >&2 "=> $1"
-  return 1
+  exit 1
 }
 
 # Checks that the selected method exists

@@ -16,36 +16,30 @@ after() {
 }
 
 it_returns_the_first_argument() {
-  local ret=$(nvm_lookup_profile "__file__")
-  test "$ret" = "__file__"
+  test $(nvm_lookup_profile "__file__") = "__file__"
 }
 
 it_selects_bashrc_if_it_exists_and_no_argument_is_provided() {
-  local ret=$(nvm_lookup_profile)
-  test "$ret" = "./.bashrc"
+  test $(nvm_lookup_profile) = "./.bashrc"
 }
 
 it_otherwise_selects_bash_profile() {
   rm -f .bashrc
-  local ret=$(nvm_lookup_profile)
-  test "$ret" = "./.bash_profile"
+  test $(nvm_lookup_profile) = "./.bash_profile"
 }
 
 it_otherwise_selects_zshrc() {
   rm -f .bashrc .bash_profile
-  local ret=$(nvm_lookup_profile)
-  test "$ret" = "./.zshrc"
+  test $(nvm_lookup_profile) = "./.zshrc"
 }
 
 it_otherwise_selects_profile() {
   rm -f .bashrc .bash_profile .zshrc
-  local ret=$(nvm_lookup_profile)
-  test "$ret" = "./.profile"
+  test $(nvm_lookup_profile) = "./.profile"
 }
 
 it_otherwise_returns_an_empty_string() {
   rm -f .bashrc .bash_profile .zshrc .profile
-  local ret=$(nvm_lookup_profile)
-  test -z "$ret"
+  test -z $(nvm_lookup_profile)
 }
 
