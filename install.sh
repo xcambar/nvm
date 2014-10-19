@@ -4,7 +4,7 @@ set -e
 
 nvm_has() {
   type "$1" > /dev/null 2>&1
-  echo $?
+  exit $?
 }
 
 # Detect profile file 
@@ -194,7 +194,7 @@ nvm_setup_method() {
   echo $method
 }
 
-run() {
+nvm_run_install() {
   method=$(nvm_setup_method "$METHOD" $(nvm_has "git") $(nvm_has "curl") $(nvm_has "wget"))
   profile=$(nvm_lookup_profile "$PROFILE")
   : ${NVM_DIR:="$HOME/.nvm"}
@@ -214,5 +214,5 @@ run() {
 # PROFILE
 
 if [ "$ENV" != "testing" ]; then 
-  run
+  nvm_run_install
 fi
