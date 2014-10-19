@@ -136,7 +136,7 @@ nvm_manual_profile_update_msg() {
   echo "    * Create the startup script corresponding to your shell and run this script again,"
   echo "    * Append the following lines to your shell's startup script:"
   echo
-  printf "$startup_script"
+  printf "$script"
   echo
 }
 
