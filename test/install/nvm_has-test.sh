@@ -12,6 +12,6 @@ it_succeeds_when_executable_exists() {
 
 it_fails_when_executable_doesnt_exist() {
   local code
-  $( nvm_has doesnt_exist ) && code="OK_$?" || code="KO_$?"; 
+  nvm_has doesnt_exist && code="OK_$?" || code="KO_$?"; 
   test "$code" = "KO_1"
 }

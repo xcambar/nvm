@@ -3,8 +3,8 @@
 set -e 
 
 nvm_has() {
-  type "$1" > /dev/null 2>&1
-  exit $?
+  $( type "$1" > /dev/null 2>&1 )
+  return $?
 }
 
 # Detect profile file 
@@ -179,12 +179,12 @@ nvm_method_name() {
 
 nvm_setup_method() {
   local method="$1"
-  local git="$2"
-  local curl="$3"
-  local wget="$4"
-  if ! [ -z $curl ]; then curl=true; else curl=false; fi
-  if ! [ -z $wget ]; then wget=true; else wget=false; fi
-  if ! [ -z $git ]; then git=true; else git=false; fi
+  local git
+  local curl
+  local wget
+  nvm_has git && git=true || git=false
+  nvm_has curl && curl=true || curl=false
+  nvm_has wget && wget=true || wget=false
 
   if ! $git && ! $curl && ! $wget; then
     nvm_error "You need git, curl, or wget to install nvm"
@@ -195,7 +195,7 @@ nvm_setup_method() {
 }
 
 nvm_run_install() {
-  method=$(nvm_setup_method "$METHOD" $(nvm_has "git") $(nvm_has "curl") $(nvm_has "wget"))
+  method=$(nvm_setup_method "$METHOD")
   profile=$(nvm_lookup_profile "$PROFILE")
   : ${NVM_DIR:="$HOME/.nvm"}
   : ${NVM_SOURCE:=$(nvm_default_source $method)}
