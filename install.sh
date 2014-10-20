@@ -1,15 +1,33 @@
 #!/bin/bash
 
+# 
+# This script install [NVM](https://github.com/creationix/nvm)
+#
+# Simply run `./install.sh` to start the installation process
+# 
+# Execution can be customized with the following environment variables:
+#
+# * NVM_DIR (defaults to `$HOME/.nvm`)
+# * NVM_SOURCE (the default value depends on `$METHOD`)
+# * METHOD (defaults to `git`)
+# * PROFILE (defaults to `$PROFILE`)
+#
+
+# Exits on errors
 set -e 
 
+#
+# Checks that an executable is available
+# 
 nvm_has() {
   $( type "$1" > /dev/null 2>&1 )
   return $?
 }
 
-# Detect profile file 
-# We're not doing anything critical here
-# The checks will come later
+# 
+# Determines a PROFILE file if not already provided
+# This file will contain the init script for NVM
+# 
 nvm_lookup_profile() {
   local profile="$1"
   if [ -n "$profile" ]; then
@@ -25,6 +43,10 @@ nvm_lookup_profile() {
   fi
 }
 
+#
+# Download NVM as a script
+# works with curl and wget
+# 
 nvm_download() {
   local method=$1
   shift
@@ -42,6 +64,9 @@ nvm_download() {
   fi
 }
 
+#
+# Installs NVM with git or updates nvm if detected
+#
 install_nvm_from_git() {
   local source="$1"
   local dest="$2"
@@ -63,6 +88,9 @@ install_nvm_from_git() {
   return
 }
 
+#
+# Prepares for installation as script
+# 
 install_nvm_as_script() {
   local method="$1"
   local source="$2"
@@ -80,14 +108,18 @@ install_nvm_as_script() {
   }
 }
 
+#
+# Outputs an error to stderr
+# exits the current cript
+#
 nvm_error () {
   echo >&2 "=> $1"
   exit 1
 }
 
-# Checks that the selected method exists
-# and is available
-# Helps when the user specifies the method
+#
+# Checks that the selected method exists and can be executed
+#
 nvm_check_method() {
   local method="$1"
   local has_git=$2
@@ -109,6 +141,9 @@ nvm_check_method() {
   return 0
 }
 
+#
+# Returns the default location for the selected method
+#
 nvm_default_source() {
   local method="$1"
   if [ "$method" = "git" ]; then
@@ -118,6 +153,9 @@ nvm_default_source() {
   fi
 }
 
+#
+# Starts the installation process based on the selected method
+#
 nvm_install_with_method() {
   local method="$1"
   local source="$2"
@@ -129,6 +167,9 @@ nvm_install_with_method() {
   fi
 }
 
+#
+# Display a message when the PROFILE has not been found
+#
 nvm_manual_profile_update_msg() {
   local script="$1"
   echo "=> Profile not found. Tried \$PROFILE, ~/.bashrc, ~/.bash_profile, ~/.zshrc, and ~/.profile."
@@ -140,6 +181,9 @@ nvm_manual_profile_update_msg() {
   echo
 }
 
+#
+# Automatically updates the user's profile
+#
 nvm_auto_profile_update() {
   local dest="$1"
   local script="$2"
@@ -151,6 +195,10 @@ nvm_auto_profile_update() {
   fi
 }
 
+#
+# Decides whether to do an automatic update of the profile
+# or if the user needs to do it
+#
 nvm_update_profile() {
   local profile="$1"
   local nvm_dir="$2"
@@ -163,20 +211,27 @@ nvm_update_profile() {
   fi
 }
 
-# Autodetect install method
+#
+# Selects the method by availability
+# Selected in this order: git > curl > wget
+#
 nvm_method_name() {
-  local git=$1
-  local curl=$2
-  local wget=$3
-  if $git; then
+  local has_git=$1
+  local has_curl=$2
+  local has_wget=$3
+  if $has_git; then
     echo "git"
-  elif $curl; then
+  elif $has_curl; then
     echo "curl"
-  elif $wget; then
+  elif $has_wget; then
     echo "wget"
   fi
 }
 
+#
+# Checks that at least one of the valid methods are available
+# and checks that the selected one can be used
+#
 nvm_setup_method() {
   local method="$1"
   local git
@@ -194,6 +249,9 @@ nvm_setup_method() {
   echo $method
 }
 
+#
+# Start the actual install process
+#
 nvm_run_install() {
   method=$(nvm_setup_method "$METHOD")
   profile=$(nvm_lookup_profile "$PROFILE")
@@ -206,12 +264,6 @@ nvm_run_install() {
   source "$NVM_DIR/nvm.sh"
   echo "=> Installation successful."
 }
-
-# Environment variables:
-# NVM_DIR
-# NVM_SOURCE
-# METHOD
-# PROFILE
 
 if [ "$ENV" != "testing" ]; then 
   nvm_run_install
